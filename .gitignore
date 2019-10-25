@@ -4,10 +4,7 @@ __pycache__/
 *$py.class
 
 .idea/
-mlflow_server/data/*
-mlflow_server/postgres/data/*
-mlflow_server/postgres/pgadmin/*
-mlflow_server/
+mlflow_server/*
 # C extensions
 *.so
 
