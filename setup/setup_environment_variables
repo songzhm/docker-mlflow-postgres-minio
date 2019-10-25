@@ -38,9 +38,9 @@ echo "MINIO_PORT is set to ${MINIO_PORT}"
 export MLFLOW_BUCKET_NAME=mlflow
 echo "MLFLOW_BUCKET_NAME is set to ${MLFLOW_BUCKET_NAME}"
 
-export PGADMIN_DEFAULT_EMAIL="admin@email.com"
+export PGADMIN_DEFAULT_EMAIL="mlflow@gmail.com"
 echo "PGADMIN_DEFAULT_EMAIL is set to ${PGADMIN_DEFAULT_EMAIL}"
 
-export PGADMIN_DEFAULT_PASSWORD=password
+export PGADMIN_DEFAULT_PASSWORD=pgadmin4
 echo "PGADMIN_DEFAULT_PASSWORD is set to ${PGADMIN_DEFAULT_PASSWORD}"
 
