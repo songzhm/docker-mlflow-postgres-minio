@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 .idea/
-mlflow_server/*
+demo_server/*
 # C extensions
 *.so
 
