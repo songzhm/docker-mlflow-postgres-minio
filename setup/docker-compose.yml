@@ -1,0 +1,68 @@
+version: '3.7'
+
+services:
+# container for mlflow_tracker - database
+  mlflow_tracker:
+    build:
+      context: .
+      dockerfile: mlflow_server/Dockerfile
+    depends_on:
+      - pgdb
+      - minio
+    image: mlflow_server
+    ports:
+      - 5000:5000
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:${MINIO_PORT}
+      AWS_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY}
+      MLFLOW_TRACKING_HOST: ${MLFLOW_TRACKING_HOST}
+      MINIO_PORT: ${MINIO_PORT}
+      MLFLOW_BUCKET_NAME: ${MLFLOW_BUCKET_NAME}
+    volumes:
+      - ${MLFLOW_TRACKING_DIRECTORY}/tracking:/tracking
+      - ${MLFLOW_TRACKING_DIRECTORY}/artifacts:/artifacts
+    command:
+      - /wait-for-pgdb-and-minio.sh
+      - mlflow server
+      - --backend-store-uri ${MLFLOW_BACKEND_STORE}
+      - --default-artifact-root s3://${MLFLOW_BUCKET_NAME}/artifacts
+      - --host 0.0.0.0
+      - --port ${MLFLOW_TRACKING_PORT}
+
+
+# container for postgres database server
+  pgdb:
+    image: postgres:10
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: mlflow_pw
+      POSTGRES_USER: mlflow_user
+      POSTGRES_DB: mlflow_db
+    volumes:
+      - ${MLFLOW_TRACKING_DIRECTORY}/postgres/data:/var/lib/postgresql/data
+
+
+# container for postgres admin server
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 80:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - ${MLFLOW_TRACKING_DIRECTORY}/postgres/pgadmin:/var/lib/pgadmin
+
+  minio:
+    image: minio/minio
+    ports:
+      - ${MINIO_PORT}:9000
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    volumes:
+      - ${MLFLOW_TRACKING_DIRECTORY}/data:/data
+    command: server /data
+
